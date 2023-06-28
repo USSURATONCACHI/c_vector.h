@@ -24,13 +24,7 @@ Check out examples for more information!
 // Create your custom vector type like this:
 #define VECTOR_IMPLEMENTATION   // Without this there will be only headers
 #define VECTOR_ITEM_TYPE double
-
-// You can specify destructor for your elements, if you want (example 02):
-//#define VECTOR_ITEM_DESTRUCTOR destroy_double 
-
 #include <vector.h>
-
-// Now vec_<your-type> type is available. In this case, it is vec_double!
 
 int main() {
     vec_double vector = vec_double_create();
@@ -38,14 +32,13 @@ int main() {
     vec_double_push(vector, 1.0);
     vec_double_push(vector, 2.0);
     vec_double_push(vector, 3.0);
+    vec_double_insert(vector, 4.0, 1);
 
     // Extract last elements with _popget or destroy last elements with _popfree 
     double last = vec_double_popget(vector);
     printf("Pop: %lf\n", last);
 
-    vec_double_insert(vector, 4.0, 1);
-
-    printf("4.0 = %lf\n", vector->data[1]); // Access data via vector->data
+    printf("4.0 = %lf\n", vector->data[1]);
 
     printf("length = %d, capacity = %d\n", vector->length, vector->capacity);
 
