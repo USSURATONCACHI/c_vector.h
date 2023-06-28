@@ -1,0 +1,4 @@
+examples/*.exe
+examples/*.
+.vscode
+**/.DS_Store
