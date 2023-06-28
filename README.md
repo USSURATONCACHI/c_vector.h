@@ -1,5 +1,7 @@
 # Introduction
-`vector.h` is a header-only library that allows you to use vectors of whatever type you want (and nested vectors). 
+`vector.h` IS PURE C. 
+
+`vector.h` is a header-only library that allows you to use vectors of whatever type you want (and nested vectors). Like template vectors from C++ but in C.
 
 `vector.h` has no dependencies (except standard headers).
 
@@ -17,11 +19,15 @@ It is a simple analog to C++ templated `std::vector<T>` but in `PURE C`. It has 
 Check out examples for more information!
 ## Simple vector
 ```c
+#include <stdio.h>
+
 // Create your custom vector type like this:
 #define VECTOR_IMPLEMENTATION   // Without this there will be only headers
 #define VECTOR_ITEM_TYPE double
+
 // You can specify destructor for your elements, if you want (example 02):
 //#define VECTOR_ITEM_DESTRUCTOR destroy_double 
+
 #include <vector.h>
 
 // Now vec_<your-type> type is available. In this case, it is vec_double!
@@ -30,16 +36,25 @@ int main() {
     vec_double vector = vec_double_create();
 
     vec_double_push(vector, 1.0);
+    vec_double_push(vector, 2.0);
+    vec_double_push(vector, 3.0);
+
     // Extract last elements with _popget or destroy last elements with _popfree 
     double last = vec_double_popget(vector);
     printf("Pop: %lf\n", last);
+
+    vec_double_insert(vector, 4.0, 1);
+
+    printf("4.0 = %lf\n", vector->data[1]); // Access data via vector->data
+
+    printf("length = %d, capacity = %d\n", vector->length, vector->capacity);
 
     vec_double_free(vector);
 }
 ```
 
 ## Nested vectors
-Check out example 03 for mor info.
+Check out example 03 for more info.
 ```c
 #define VECTOR_IMPLEMENTATION
 
@@ -69,6 +84,7 @@ int main() {
 * `vec_T vec_T_from_raw(T* source, int length);` - cast pointer and length into vector.
 
 * `void vec_T_push(vec_T vec, T item);` - push item to the very end of vector.
+* `void vec_T_insert(vec_T vec, T item, int index);` - insert item at the index and shifts all other element to the right.
 
 * `T vec_T_popget(vec_T vec);` - pop last element and return it.
 * `void vec_T_popfree(vec_T vec);` - pop last element and destry it.
@@ -81,3 +97,7 @@ int main() {
 
 * `T vec_T_at(vec_T vec, int i);` - returns the i-th item (copies by value).
 * `T* vec_T_atref(vec_T vec, int i);` - returns the pointer to i-th element.
+
+# Examples
+
+You can try examples for yourself by going to examples folder and using `make <test-name>` to run tests. Like this: `make 01_simple`.

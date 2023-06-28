@@ -11,9 +11,11 @@ int main() {
 
     vec_double_push(vector, 1.0);
     vec_double_push(vector, 2.0);
-    vec_double_push(vector, 3.0);
     vec_double_push(vector, 4.0);
     vec_double_push(vector, 5.0);
+    vec_double_push(vector, 6.0);
+
+    vec_double_insert(vector, 3.0, 2);
 
     for (int i = 0; i < vector->length; i++)
         printf("Element: %lf\n", vector->data[i]);

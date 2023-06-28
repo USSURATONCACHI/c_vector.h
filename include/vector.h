@@ -69,6 +69,7 @@
     #define VEC_FROM_RAW(a)      CONCAT(VEC_T, _from_raw)
 
     #define VEC_PUSH(a)             CONCAT(VEC_T, _push)
+    #define VEC_INSERT(a)           CONCAT(VEC_T, _insert)
     #define VEC_POPGET(a)           CONCAT(VEC_T, _popget)
     #define VEC_POPFREE(a)          CONCAT(VEC_T, _popfree)
     #define VEC_AT(a)               CONCAT(VEC_T, _at)
@@ -87,6 +88,7 @@
     VEC_STATIC_PREFIX VEC_T VEC_FROM_RAW(_)         (ITEM_T* source, int length);
     
     VEC_STATIC_PREFIX void VEC_PUSH(_)              (VEC_T vec, ITEM_T item);
+    VEC_STATIC_PREFIX void VEC_INSERT(_)            (VEC_T vec, ITEM_T item, int index);
 
     VEC_STATIC_PREFIX ITEM_T VEC_POPGET(_)          (VEC_T vec);
     VEC_STATIC_PREFIX void VEC_POPFREE(_)           (VEC_T vec);
@@ -130,6 +132,20 @@
 
         }
 
+        #ifdef DEBUG
+            #define CHECK_LEN_ZERO(vec)\
+                if (vec->length <= 0)\
+                    panic("%s (at %p) is empty, it's length is %d\n", STR(VEC_T), (void*)vec, vec->length);
+
+            #define CHECK_INDEX(vec, index)\
+                if (index >= vec->length)\
+                    panic("%s (at %p) index is out of bounds. Index = %d, length = %d\n", STR(VEC_T), (void*)vec, index, vec->length);
+        #else
+            #define CHECK_LEN_ZERO(vec) if (vec->length <= 0) unreachable();
+
+            #define CHECK_INDEX(vec, index) if (index >= vec->length) unreachable();
+        #endif
+
         VEC_STATIC_PREFIX void VEC_PUSH(_) (VEC_T vec, ITEM_T item) {
             if (vec->length > vec->capacity) {
                 #ifdef DEBUG
@@ -150,19 +166,22 @@
             vec->length++;
         }
 
-        #ifdef DEBUG
-            #define CHECK_LEN_ZERO(vec)\
-                if (vec->length <= 0)\
-                    panic("%s (at %p) is empty, it's length is %d\n", STR(VEC_T), (void*)vec, vec->length);
+        VEC_STATIC_PREFIX void VEC_INSERT(_) (VEC_T vec, ITEM_T item, int index) {
+            if (index == vec->length) {
+                VEC_PUSH(_) (vec, item);
+            } else {
+                CHECK_INDEX(vec, index);
+                ITEM_T tmp = vec->data[index];
+                vec->data[index] = item;
+                for (int i = index + 1; i < vec->length; i++) {
+                    ITEM_T tmp2 = vec->data[i];
+                    vec->data[i] = tmp;
+                    tmp = tmp2;
+                }
+                VEC_PUSH(_) (vec, tmp);
 
-            #define CHECK_INDEX(vec, index)\
-                if (index >= vec->length)\
-                    panic("%s (at %p) index is out of bounds. Index = %d, length = %d\n", STR(VEC_T), (void*)vec, index, vec->length);
-        #else
-            #define CHECK_LEN_ZERO(vec) if (vec->length <= 0) unreachable();
-
-            #define CHECK_INDEX(vec, index) if (index >= vec->length) unreachable();
-        #endif
+            }
+        }
 
         VEC_STATIC_PREFIX ITEM_T VEC_POPGET(_) (VEC_T vec) {
             CHECK_LEN_ZERO(vec);
@@ -265,6 +284,7 @@
     #undef VEC_CREATE_COPY
     #undef VEC_FROM_RAW
     #undef VEC_PUSH
+    #undef VEC_INSERT
     #undef VEC_POPGET
     #undef VEC_POPFREE
     #undef VEC_AT
