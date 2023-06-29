@@ -6,6 +6,7 @@
 
 #define VECTOR_IMPLEMENTATION
 #define VECTOR_ITEM_TYPE int
+#define VECTOR_MAKE_STATIC
 #include <vector.h>
 
 int main() {
